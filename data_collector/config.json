@@ -1,1 +1,9 @@
- 
+{
+    "vk_token": "sosi",
+    "api_version": "5.131",
+    "group_ids": [
+        "-193207811"
+    ],
+    "raw_result_path": "result/data_raw.json",
+    "result_path": "result/data.csv"
+}

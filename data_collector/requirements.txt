@@ -3,3 +3,4 @@ pandas
 autopep8
 pylint
 coverage
+requests
