@@ -1,0 +1,5 @@
+numpy
+pandas
+autopep8
+pylint
+coverage
