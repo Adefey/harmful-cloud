@@ -4,8 +4,11 @@ import pandas as pd
 
 def clean_string(string):
     string = string.strip()
-    chars_to_delete = "\n\t\r!&?-+=@.,:/1234567890"
+    chars_to_delete = "\n\t\r1234567890"
+    chars_to_replace_space = "!&?-+=@.,:/"
     for char in chars_to_delete:
+        string = string.replace(char, "")
+    for char in chars_to_replace_space:
         string = string.replace(char, " ")
     return string
 

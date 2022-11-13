@@ -11,3 +11,6 @@
           sudo apt update
           sudo apt install python
           sudo pip install -r data_collector/requirements.txt
+      - name: check_code
+        run: |
+          make check -C ./data_collector/
