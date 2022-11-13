@@ -50,8 +50,8 @@ def get_wall_post_links(vk_token, api_version, group_id):
             f"KeyError. Maybe the response is wrong format; Check it:\n{wall}")
     posts = []
     logging.info(
-            f"Start revieve of ids and texts of number of posts: {post_count}")
-    for i in range(0, post_count+STRIDE, STRIDE):
+        f"Start revieve of ids and texts of number of posts: {post_count}")
+    for i in range(0, post_count, STRIDE):
         wall = make_request(vk_token, api_version, "wall.get", {
             "owner_id": group_id, "count": STRIDE, "offset": i})
         wall_items = wall["response"]["items"]
@@ -72,12 +72,13 @@ def get_post_text_comments(vk_token, api_version, group_id, post_id):
             f"KeyError. Maybe the response is wrong format; Check it:\n{comments}")
     comments_text = []
     logging.info(
-            f"Start revieve of texts of number of comments: {comment_count}")
-    for i in range(0, comment_count+STRIDE, STRIDE):
+        f"Start revieve of texts of number of comments: {comment_count}")
+    for i in range(0, comment_count, STRIDE):
         comments = make_request(vk_token, api_version, "wall.getComments", {
             "owner_id": group_id, "post_id": post_id, "count": STRIDE, "offset": i})
         comments_items = comments["response"]["items"]
-        comments_text.extend([comments_item["text"].strip() for comments_item in comments_items])
+        comments_text.extend([comments_item["text"]
+                             for comments_item in comments_items])
         logging.info(
             f"Got new comments batch. Total comment (for this post) count: {len(comments_text)}")
 
