@@ -3,7 +3,8 @@ import pandas as pd
 
 
 def clean_string(string):
-    chars_to_delete = "\n\t\r!&?-+=@.,:/"
+    string = string.strip()
+    chars_to_delete = "\n\t\r!&?-+=@.,:/1234567890"
     for char in chars_to_delete:
         string = string.replace(char, " ")
     return string
@@ -15,6 +16,6 @@ def json_to_clean_csv(json_string):
     for post, comments in data.items():
         for comment in comments:
             if (comment != "") and (post != ""):
-                data_frame = data_frame.append({"post_text": clean_string(post), "comment_text": clean_string(comment)},
-                                               ignore_index=True)
+                data_frame = data_frame.append({"post_text": clean_string(
+                    post), "comment_text": clean_string(comment)}, ignore_index=True)
     return data_frame.to_csv()
