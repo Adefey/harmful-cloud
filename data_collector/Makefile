@@ -16,4 +16,4 @@ check:
 	pylint $(SOURCES) --disable=missing-module-docstring,missing-function-docstring,missing-class-docstring,wrong-import-position,line-too-long,logging-fstring-interpolation,wrong-import-order
 
 receive_data:
-	python ./sources/main.py $(CONFIG_PATH)
+	nohup python3 ./sources/main.py $(CONFIG_PATH) &

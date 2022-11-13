@@ -1,5 +1,5 @@
 {
-    "vk_token": "secret vk token",
+    "vk_token": "vk token",
     "api_version": "5.131",
     "group_ids": [
         "-59336460"
