@@ -1,8 +1,8 @@
 {
-    "vk_token": "vk token",
+    "vk_token": "token",
     "api_version": "5.131",
     "group_ids": [
-        "-59336460"
+        "-193207811"
     ],
     "cache_filename": "__cache.json",
     "result_path": "result/data.csv"

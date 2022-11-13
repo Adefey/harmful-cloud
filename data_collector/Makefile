@@ -4,7 +4,7 @@ CONFIG_PATH=config.json
 SOURCES=./sources/*.py
 RESULT=./result
 
-all: install_packages format check receive_data
+all: install_packages format check receive_data post_process
 
 install_packages:
 	sudo pip install -r requirements.txt
@@ -16,4 +16,13 @@ check:
 	pylint $(SOURCES) --disable=missing-module-docstring,missing-function-docstring,missing-class-docstring,wrong-import-position,line-too-long,logging-fstring-interpolation,wrong-import-order
 
 receive_data:
-	nohup python3 ./sources/main.py $(CONFIG_PATH) &
+	python3 ./sources/main_receive_data.py $(CONFIG_PATH)
+
+post_process:
+	python3 ./sources/main_post_process.py $(CONFIG_PATH)
+
+receive_data_async:
+	nohup python3 ./sources/main_receive_data.py $(CONFIG_PATH) &
+
+post_process_async:
+	nohup python3 ./sources/main_post_process.py $(CONFIG_PATH) &
