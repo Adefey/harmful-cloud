@@ -46,15 +46,20 @@ def get_wall_post_links(vk_token, api_version, group_id):
     try:
         wall = make_request(vk_token, api_version, "wall.get", {
                             "owner_id": group_id, "count": 1})
-    except RuntimeError:
+    except RuntimeError as exception:
+        logging.info(f"Error occured while fetching posts:\n{exception}")
         return []
     post_count = int(wall["response"]["count"])
     posts = []
     logging.info(
         f"Start revieve of ids and texts of number of posts: {post_count}")
     for i in range(0, post_count, STRIDE):
-        wall = make_request(vk_token, api_version, "wall.get", {
-            "owner_id": group_id, "count": STRIDE, "offset": i})
+        try:
+            wall = make_request(vk_token, api_version, "wall.get", {
+                "owner_id": group_id, "count": STRIDE, "offset": i})
+        except RuntimeError as exception:
+            logging.info(f"Error occured while fetching posts:\n{exception}")
+            return []
         wall_items = wall["response"]["items"]
         posts.extend([(post["id"], post["text"]) for post in wall_items])
         logging.info(
@@ -67,15 +72,20 @@ def get_post_text_comments(vk_token, api_version, group_id, post_id):
     try:
         comments = make_request(vk_token, api_version, "wall.getComments", {
             "owner_id": group_id, "post_id": post_id, "count": 1})
-    except RuntimeError:
+    except RuntimeError as exception:
+        logging.info(f"Error occured while fetching comments:\n{exception}")
         return []
     comment_count = int(comments["response"]["count"])
     comments_text = []
     logging.info(
         f"Start revieve of texts of number of comments: {comment_count}")
     for i in range(0, comment_count, STRIDE):
-        comments = make_request(vk_token, api_version, "wall.getComments", {
-            "owner_id": group_id, "post_id": post_id, "count": STRIDE, "offset": i})
+        try:
+            comments = make_request(vk_token, api_version, "wall.getComments", {
+                "owner_id": group_id, "post_id": post_id, "count": STRIDE, "offset": i})
+        except RuntimeError as exception:
+            logging.info(f"Error occured while fetching comments:\n{exception}")
+            return []
         comments_items = comments["response"]["items"]
         comments_text.extend([comments_item["text"]
                              for comments_item in comments_items])
