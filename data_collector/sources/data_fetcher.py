@@ -21,7 +21,7 @@ def make_request(vk_token, api_version, method, parameters):
             request_method_str, params=param_dict, timeout=TIMEOUT).json()
     except Exception as exception:
         raise RuntimeError(
-            f"Request error. Could not connect to server with timeout={TIMEOUT}; Check it:\n{exception}")
+            f"Request error. Could not connect to server with timeout={TIMEOUT}; Check it:\n{exception}") from exception
     if "error" in response:
         raise RuntimeError(
             f"Request error. Server returned error status; Check it:\n{response}")
