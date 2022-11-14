@@ -3,7 +3,7 @@ import os
 import json
 import logging
 logging.basicConfig(format="%(asctime)s %(message)s",
-                    datefmt="%I:%M:%S %p", level=logging.INFO)
+                    datefmt="%I:%M:%S", level=logging.INFO)
 
 
 STRIDE = 100
@@ -80,7 +80,8 @@ def get_post_text_comments_25(vk_token, api_version, group_id, post_ids):
 var comments = [];
 var post_ids = {post_ids};
 for (const post_id of post_ids){{
-comments.push(API.wall.getComments({{'owner_id':'{group_id}','post_id':post_id}}));
+var new_array = API.wall.getComments({{'owner_id':'{group_id}','post_id':post_id, 'count':'100'}})
+comments.push(new_array);
 }}
 return comments;
 """
