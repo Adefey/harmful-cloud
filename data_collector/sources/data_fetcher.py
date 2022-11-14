@@ -16,8 +16,12 @@ def make_request(vk_token, api_version, method, parameters):
     param_dict = parameters
     param_dict.update({"v": api_version, "access_token": {vk_token}})
     request_method_str = f"{base_url}{method}"
-    response = requests.get(
-        request_method_str, params=param_dict, timeout=TIMEOUT).json()
+    try:
+        response = requests.get(
+            request_method_str, params=param_dict, timeout=TIMEOUT).json()
+    except Exception as exception:
+        raise RuntimeError(
+            f"Request error. Could not connect to server with timeout={TIMEOUT}; Check it:\n{exception}")
     if "error" in response:
         raise RuntimeError(
             f"Request error. Server returned error status; Check it:\n{response}")
