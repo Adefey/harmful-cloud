@@ -1,8 +1,12 @@
 {
-    "vk_token": "boba",
+    "vk_token": "Все научные достижения...",
     "api_version": "5.131",
     "group_ids": [
-        "-193207811"
+        "-193207811",
+        "-59336460",
+        "-103133619",
+        "-40427933",
+        "-109863468"
     ],
     "cache_filename": "__cache.json",
     "result_path": "result/data.csv"

@@ -2,12 +2,13 @@ import requests
 import os
 import json
 import logging
+from functools import reduce
 logging.basicConfig(format="%(asctime)s %(message)s",
                     datefmt="%I:%M:%S", level=logging.INFO)
 
 
 STRIDE = 100
-TIMEOUT = 10
+TIMEOUT = 50
 
 
 def make_request(vk_token, api_version, method, parameters):
@@ -36,7 +37,7 @@ def generate_data_to_cache(vk_token, api_version, group_ids, cache_filename):
             posts = get_wall_post_links(vk_token, api_version, group_id)
             for i in range(0, len(posts), 25):
                 cur_post_ids, cur_post_texts = (
-                    [str(x[0]) for x in posts[i:i+25]], [x[1] for x in posts[i:i+25]])
+                    [x[0] for x in posts[i:i+25]], [x[1] for x in posts[i:i+25]])
                 posts_comments = get_post_text_comments_25(
                     vk_token, api_version, group_id, cur_post_ids)
                 post_text_pairs = zip(cur_post_texts, posts_comments)
@@ -61,14 +62,21 @@ def get_wall_post_links(vk_token, api_version, group_id):
     posts = []
     logging.info(
         f"Start revieve of ids and texts of number of posts: {post_count}")
+
     for i in range(0, post_count, STRIDE):
+        vkscript_code = "var posts = []; "
+        queries = [
+            f"posts.push(API.wall.get({{'owner_id':{group_id},'count':{STRIDE}, 'offset':{j}}})); " for j in range(i, i+25*STRIDE, STRIDE)]
+        vkscript_code = vkscript_code + " ".join(queries)
+        vkscript_code = f"{vkscript_code} return posts;"
         try:
-            wall = make_request(vk_token, api_version, "wall.get", {
-                "owner_id": group_id, "count": STRIDE, "offset": i})
+            wall = make_request(vk_token, api_version, "execute", {
+                "code": vkscript_code})
         except RuntimeError as exception:
             logging.info(f"Error occured while fetching posts:\n{exception}")
             return []
-        wall_items = wall["response"]["items"]
+        wall_items = [wall_result["items"] for wall_result in wall["response"]]
+        wall_items = list(reduce(lambda x, y: x + y, wall_items))
         posts.extend([(post["id"], post["text"]) for post in wall_items])
         logging.info(
             f"Got new wall posts batch. Total wall posts (for this group) count: {len(posts)}")
@@ -76,21 +84,19 @@ def get_wall_post_links(vk_token, api_version, group_id):
 
 
 def get_post_text_comments_25(vk_token, api_version, group_id, post_ids):
-    vkscript_code = f"""
-var comments = [];
-var post_ids = {post_ids};
-for (const post_id of post_ids){{
-var new_array = API.wall.getComments({{'owner_id':'{group_id}','post_id':post_id, 'count':'100'}})
-comments.push(new_array);
-}}
-return comments;
-"""
-    print(vkscript_code)
+    '''Возвращает первые 100 комментариев для 25 постов одновременно'''
+    vkscript_code = "var comments = []; "
+    queries = [
+        f"comments.push(API.wall.getComments({{'owner_id':{group_id},'post_id':{post_id}, 'count':100}})); " for post_id in post_ids]
+    vkscript_code = vkscript_code + " ".join(queries)
+    vkscript_code = f"{vkscript_code} return comments;"
     try:
         comments_list = make_request(vk_token, api_version, "execute", {
                                      "code": vkscript_code})
     except RuntimeError as exception:
         logging.info(f"Error occured while fetching comments:\n{exception}")
         return []
-    comments_items = comments_list["response"]["items"]
-    return [comments_item["text"] for comments_item in comments_items]
+    comments_items = comments_list["response"]
+    logging.info(
+        f"Got new comments array batch. Total comment arrays (for this group): {len(comments_items)}")
+    return [[comment["text"] for comment in comments_item["items"]] for comments_item in comments_items]
