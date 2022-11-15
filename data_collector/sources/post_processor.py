@@ -13,12 +13,13 @@ def clean_string(string):
 
 
 def json_to_clean_csv(json_string):
-    data_frame = pd.DataFrame(columns=["post_text", "comment_text"])
     data = json.loads(json_string)
+    data_frame_list = []
     for post, comments in tqdm(data.items()):
         for comment in comments:
             if comment != "":
                 if post != "":
-                    data_frame = data_frame.append({"post_text": clean_string(
-                        post), "comment_text": clean_string(comment)}, ignore_index=True)
+                    data_frame_list.append({"post_text": clean_string(
+                        post), "comment_text": clean_string(comment)})
+    data_frame = pd.DataFrame(data_frame_list)
     return data_frame.to_csv()
