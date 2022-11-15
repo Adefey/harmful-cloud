@@ -9,6 +9,7 @@ logging.basicConfig(format="%(asctime)s %(message)s",
 
 STRIDE = 100
 TIMEOUT = 50
+TWENTY_FIVE = 25
 
 
 def make_request(vk_token, api_version, method, parameters):
@@ -35,9 +36,9 @@ def generate_data_to_cache(vk_token, api_version, group_ids, cache_filename):
         file.write("{")
         for group_id in group_ids:
             posts = get_wall_post_links(vk_token, api_version, group_id)
-            for i in range(0, len(posts), 25):
+            for i in range(0, len(posts), TWENTY_FIVE):
                 cur_post_ids, cur_post_texts = (
-                    [x[0] for x in posts[i:i+25]], [x[1] for x in posts[i:i+25]])
+                    [x[0] for x in posts[i:i+TWENTY_FIVE]], [x[1] for x in posts[i:i+TWENTY_FIVE]])
                 posts_comments = get_post_text_comments_25(
                     vk_token, api_version, group_id, cur_post_ids)
                 post_text_pairs = zip(cur_post_texts, posts_comments)
@@ -61,12 +62,12 @@ def get_wall_post_links(vk_token, api_version, group_id):
     post_count = int(wall["response"]["count"])
     posts = []
     logging.info(
-        f"Start revieve of ids and texts of number of posts: {post_count}")
+        f"Start revieve of ids and texts of number of posts for group {group_id}: {post_count}")
 
-    for i in range(0, post_count, STRIDE):
+    for i in range(0, post_count, TWENTY_FIVE*STRIDE):
         vkscript_code = "var posts = []; "
         queries = [
-            f"posts.push(API.wall.get({{'owner_id':{group_id},'count':{STRIDE}, 'offset':{j}}})); " for j in range(i, i+25*STRIDE, STRIDE)]
+            f"posts.push(API.wall.get({{'owner_id':{group_id},'count':{STRIDE}, 'offset':{j}}})); " for j in range(i, i+TWENTY_FIVE*STRIDE, STRIDE)]
         vkscript_code = vkscript_code + " ".join(queries)
         vkscript_code = f"{vkscript_code} return posts;"
         try:
