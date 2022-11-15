@@ -8,7 +8,7 @@ logging.basicConfig(format="%(asctime)s %(message)s",
 
 
 STRIDE = 75
-TIMEOUT = 75
+TIMEOUT = 80
 EXECUTE_COUNT = 25
 
 
@@ -23,7 +23,7 @@ def make_request(vk_token, api_version, method, parameters):
             request_method_str, params=param_dict, timeout=TIMEOUT).json()
     except Exception as exception:
         raise RuntimeError(
-            f"Request error. Could not connect to server with timeout={TIMEOUT}; Check it:\n{exception}") from exception
+            f"Request error. Server error. Could not get needed data with timeout={TIMEOUT}; Check it:\n{exception}") from exception
     if "error" in response:
         raise RuntimeError(
             f"Request error. Server returned error status; Check it:\n{response}")
@@ -74,8 +74,8 @@ def get_wall_post_links(vk_token, api_version, group_id):
             wall = make_request(vk_token, api_version, "execute", {
                 "code": vkscript_code})
         except RuntimeError as exception:
-            logging.info(f"Error occured while fetching posts:\n{exception}")
-            return []
+            logging.info(f"Error occured while fetching posts (may be this batch was too big...):\n{exception}")
+            continue
         wall_items = [wall_result["items"] for wall_result in wall["response"]]
         wall_items = list(reduce(lambda x, y: x + y, wall_items))
         posts.extend([(post["id"], post["text"]) for post in wall_items])
