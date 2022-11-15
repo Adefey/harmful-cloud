@@ -21,6 +21,8 @@ receive_data:
 post_process:
 	python3 ./sources/main_post_process.py $(CONFIG_PATH)
 
+async: receive_data_async post_process_async
+
 receive_data_async:
 	nohup python3 ./sources/main_receive_data.py $(CONFIG_PATH) &
 

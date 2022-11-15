@@ -4,12 +4,12 @@ import json
 import logging
 from functools import reduce
 logging.basicConfig(format="%(asctime)s %(message)s",
-                    datefmt="%I:%M:%S", level=logging.INFO)
+                    datefmt="%I:%M:%S %p", level=logging.INFO)
 
 
-STRIDE = 100
-TIMEOUT = 50
-TWENTY_FIVE = 25
+STRIDE = 75
+TIMEOUT = 75
+EXECUTE_COUNT = 25
 
 
 def make_request(vk_token, api_version, method, parameters):
@@ -36,10 +36,10 @@ def generate_data_to_cache(vk_token, api_version, group_ids, cache_filename):
         file.write("{")
         for group_id in group_ids:
             posts = get_wall_post_links(vk_token, api_version, group_id)
-            for i in range(0, len(posts), TWENTY_FIVE):
+            for i in range(0, len(posts), EXECUTE_COUNT):
                 cur_post_ids, cur_post_texts = (
-                    [x[0] for x in posts[i:i+TWENTY_FIVE]], [x[1] for x in posts[i:i+TWENTY_FIVE]])
-                posts_comments = get_post_text_comments_25(
+                    [x[0] for x in posts[i:i+EXECUTE_COUNT]], [x[1] for x in posts[i:i+EXECUTE_COUNT]])
+                posts_comments = get_post_text_comments_execute(
                     vk_token, api_version, group_id, cur_post_ids)
                 post_text_pairs = zip(cur_post_texts, posts_comments)
                 string_to_file = f"{json.dumps(dict(post_text_pairs), ensure_ascii=False, indent=4).replace('{','').replace('}','')},"
@@ -57,17 +57,17 @@ def get_wall_post_links(vk_token, api_version, group_id):
         wall = make_request(vk_token, api_version, "wall.get", {
                             "owner_id": group_id, "count": 1})
     except RuntimeError as exception:
-        logging.info(f"Error occured while fetching posts:\n{exception}")
+        logging.info(f"Error occured while fetching post count:\n{exception}")
         return []
     post_count = int(wall["response"]["count"])
     posts = []
     logging.info(
         f"Start revieve of ids and texts of number of posts for group {group_id}: {post_count}")
 
-    for i in range(0, post_count, TWENTY_FIVE*STRIDE):
+    for i in range(0, post_count, EXECUTE_COUNT*STRIDE):
         vkscript_code = "var posts = []; "
         queries = [
-            f"posts.push(API.wall.get({{'owner_id':{group_id},'count':{STRIDE}, 'offset':{j}}})); " for j in range(i, i+TWENTY_FIVE*STRIDE, STRIDE)]
+            f"posts.push(API.wall.get({{'owner_id':{group_id},'count':{STRIDE}, 'offset':{j}}})); " for j in range(i, i+EXECUTE_COUNT*STRIDE, STRIDE)]
         vkscript_code = vkscript_code + " ".join(queries)
         vkscript_code = f"{vkscript_code} return posts;"
         try:
@@ -80,12 +80,12 @@ def get_wall_post_links(vk_token, api_version, group_id):
         wall_items = list(reduce(lambda x, y: x + y, wall_items))
         posts.extend([(post["id"], post["text"]) for post in wall_items])
         logging.info(
-            f"Got new wall posts batch. Total wall posts (for this group) count: {len(posts)}")
+            f"Got new wall posts batch. Total wall posts for group {group_id}: {len(posts)}")
     return posts
 
 
-def get_post_text_comments_25(vk_token, api_version, group_id, post_ids):
-    '''Возвращает первые 100 комментариев для 25 постов одновременно'''
+def get_post_text_comments_execute(vk_token, api_version, group_id, post_ids):
+    '''Возвращает первые 100 комментариев для EXECUTE_COUNT постов одновременно'''
     vkscript_code = "var comments = []; "
     queries = [
         f"comments.push(API.wall.getComments({{'owner_id':{group_id},'post_id':{post_id}, 'count':100}})); " for post_id in post_ids]
@@ -99,5 +99,5 @@ def get_post_text_comments_25(vk_token, api_version, group_id, post_ids):
         return []
     comments_items = comments_list["response"]
     logging.info(
-        f"Got new comments array batch. Total comment arrays (for this group): {len(comments_items)}")
+        f"Got new comments array batch. Total comment[{STRIDE}] arrays for group {group_id}: {len(comments_items)}")
     return [[comment["text"] for comment in comments_item["items"]] for comments_item in comments_items]
