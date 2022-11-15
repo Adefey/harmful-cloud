@@ -5,10 +5,8 @@ import pandas as pd
 
 
 def clean_string(string):
-    chars_to_delete = "\n\t\r1234567890"
-    chars_to_replace_space = "!&?@.,:/"
-    string = re.sub(f"[{chars_to_delete}]", "", string)
-    string = re.sub(f"[{chars_to_replace_space}]", " ", string)
+    permitted_chars = "^0-9A-Za-zА-Яа-яёЁ.,!?/@#()*+-"
+    string = re.sub(f"[{permitted_chars}]+", " ", string)
     return string
 
 
