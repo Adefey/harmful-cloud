@@ -1,7 +1,7 @@
 import sys
 import json
 
-from post_processor import json_to_clean_csv
+from post_processor import json_to_dataframe
 
 
 def main():
@@ -10,9 +10,8 @@ def main():
         config = json.load(file)
     with open(config["cache_filename"], "r", encoding="UTF-8") as file:
         raw_result_json = file.read()
-    result = json_to_clean_csv(raw_result_json)
-    with open(config["result_path"], "w", encoding="UTF-8") as file:
-        file.write(result)
+    result = json_to_dataframe(raw_result_json)
+    result.to_csv(config["result_path"])
 
 
 if __name__ == "__main__":

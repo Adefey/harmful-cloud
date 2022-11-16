@@ -43,7 +43,7 @@ def generate_data_to_cache(vk_token, api_version, group_ids, cache_filename):
                     vk_token, api_version, group_id, cur_post_ids)
                 post_text_pairs = zip(cur_post_texts, posts_comments)
                 json_string = json.dumps(dict(post_text_pairs), ensure_ascii=False, indent=4)
-                if json_string == "":
+                if (len(json_string) < 6):
                     continue
                 string_to_file = f"{json_string.replace('{','').replace('}','')},"
                 file.write(string_to_file)
@@ -84,6 +84,7 @@ def get_wall_post_links(vk_token, api_version, group_id):
             wall_items = [wall_result["items"] for wall_result in wall["response"]]
         except Exception as exception:
             print(f"Server responded, but the response was inappropriate;\nResponse:\n{wall}\nException:\n{exception}")
+            continue
         wall_items = list(reduce(lambda x, y: x + y, wall_items))
         posts.extend([(post["id"], post["text"]) for post in wall_items])
         logging.info(
