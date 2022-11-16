@@ -42,13 +42,17 @@ def generate_data_to_cache(vk_token, api_version, group_ids, cache_filename):
                 posts_comments = get_post_text_comments_execute(
                     vk_token, api_version, group_id, cur_post_ids)
                 post_text_pairs = zip(cur_post_texts, posts_comments)
-                string_to_file = f"{json.dumps(dict(post_text_pairs), ensure_ascii=False, indent=4).replace('{','').replace('}','')},"
+                json_string = json.dumps(dict(post_text_pairs), ensure_ascii=False, indent=4)
+                if json_string == "":
+                    continue
+                string_to_file = f"{json_string.replace('{','').replace('}','')},"
                 file.write(string_to_file)
     with open(cache_filename, 'rb+') as file:  # Хочу удалить последний символ
         file.seek(-1, os.SEEK_END)
         file.truncate()
     with open(cache_filename, "a", encoding="UTF-8") as file:
         file.write("}")
+    print("SUCCESS")
 
 
 def get_wall_post_links(vk_token, api_version, group_id):
@@ -76,7 +80,10 @@ def get_wall_post_links(vk_token, api_version, group_id):
         except RuntimeError as exception:
             logging.info(f"Error occured while fetching posts (may be this batch was too big...):\n{exception}")
             continue
-        wall_items = [wall_result["items"] for wall_result in wall["response"]]
+        try:
+            wall_items = [wall_result["items"] for wall_result in wall["response"]]
+        except Exception as exception:
+            print(f"Server responded, but the response was inappropriate;\nResponse:\n{wall}\nException:\n{exception}")
         wall_items = list(reduce(lambda x, y: x + y, wall_items))
         posts.extend([(post["id"], post["text"]) for post in wall_items])
         logging.info(
