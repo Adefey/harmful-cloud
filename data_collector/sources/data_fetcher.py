@@ -52,7 +52,6 @@ def generate_data_to_cache(vk_token, api_version, group_ids, cache_filename):
         file.truncate()
     with open(cache_filename, "a", encoding="UTF-8") as file:
         file.write("}")
-    print("SUCCESS")
 
 
 def get_wall_post_links(vk_token, api_version, group_id):

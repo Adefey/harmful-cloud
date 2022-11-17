@@ -25,6 +25,7 @@ def main():
         engine = create_engine(SQLALCHEMY_DATABASE_URI, pool_recycle=1800)
         result.to_sql('posts', con=engine)
         engine.dispose()
+    print("SUCCESS")
 
 
 if __name__ == "__main__":

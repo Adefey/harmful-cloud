@@ -1,0 +1,9 @@
+numpy
+pandas
+autopep8
+pylint
+coverage
+requests
+tqdm
+sqlalchemy
+pymysql

@@ -10,6 +10,7 @@ def main():
         config = json.load(file)
     generate_data_to_cache(config["vk_token"], config["api_version"],
                            config["group_ids"], config["cache_filename"])
+    print("SUCCESS")
 
 
 if __name__ == "__main__":
