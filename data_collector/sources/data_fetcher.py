@@ -3,8 +3,7 @@ import os
 import json
 import logging
 from functools import reduce
-logging.basicConfig(format="%(asctime)s %(message)s",
-                    datefmt="%I:%M:%S %p", level=logging.INFO)
+logging.basicConfig(filename="logs.txt", filemode='a', format="%(asctime)s %(message)s", datefmt="%I:%M:%S %p", level=logging.INFO)
 
 
 STRIDE = 75

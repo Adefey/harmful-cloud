@@ -4,3 +4,4 @@ sources/config_generator.py
 sources/__pycache__
 __cache.json
 nohup.out
+logs.txt

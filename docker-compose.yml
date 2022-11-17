@@ -19,5 +19,5 @@ services:
     env_file:
       - ./mariadb/mariadb_env.txt
     ports:
-      - 3306:3306
+      - 3310:3310
     command: --max_allowed_packet=16G

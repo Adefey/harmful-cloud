@@ -19,7 +19,7 @@ def main():
         password = config["MYSQL_PASSWORD"]
         host = "mariadb"
         database = config["MYSQL_DATABASE"]
-        port = 3306
+        port = 3310
         SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{user}:{password}@{host}:{port}/{database}?charset=utf8mb4"
         print(SQLALCHEMY_DATABASE_URI)
         engine = create_engine(SQLALCHEMY_DATABASE_URI, pool_recycle=1800)
