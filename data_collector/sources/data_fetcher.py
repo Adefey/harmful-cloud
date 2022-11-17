@@ -43,7 +43,7 @@ def generate_data_to_cache(vk_token, api_version, group_ids, cache_filename):
                     vk_token, api_version, group_id, cur_post_ids)
                 post_text_pairs = zip(cur_post_texts, posts_comments)
                 json_string = json.dumps(dict(post_text_pairs), ensure_ascii=False, indent=4)
-                if (len(json_string) < 6):
+                if len(json_string) < 6:
                     continue
                 string_to_file = f"{json_string.replace('{','').replace('}','')},"
                 file.write(string_to_file)
