@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+
+  harmful_cloud_receiver:
+    privileged: true
+    build:
+      context: ./data_collector
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./data_collector:/home
+    depends_on:
+      - mariadb
+
+  mariadb:
+    image: mariadb:latest
+    volumes:
+      - ./mariadb:/var/lib/mysql:Z
+    env_file:
+      - ./mariadb/mariadb_env.txt
+    ports:
+      - 3306:3306
+    command: --max_allowed_packet=268435456
