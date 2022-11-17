@@ -5,3 +5,5 @@ pylint
 coverage
 requests
 tqdm
+sqlalchemy
+pymysql
