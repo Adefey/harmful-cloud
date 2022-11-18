@@ -1,6 +1,7 @@
 import pandas as pd
 from sqlalchemy import create_engine
 
+
 class Loader:
     def __init__(self, user, password, host, database, port, batch_size):
         self.user = user
@@ -14,9 +15,10 @@ class Loader:
         self.engine = create_engine(self.database_uri, pool_recycle=1800)
 
     def load_batch(self, offset, count):
-        df = pd.read_sql(f'select * FROM posts limit {offset}, {count}', con = self.engine)
-        X = list(df["post_text"])
-        y = list(df["comment_text"])
+        response = self.engine.execute(
+            f'select post_text, comment_text FROM posts limit {offset}, {count}').fetchall()
+        X = [row[0] for row in response]
+        y = [row[1] for row in response]
         return (X, y)
 
     def __iter__(self):
