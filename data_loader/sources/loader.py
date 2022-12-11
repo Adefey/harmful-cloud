@@ -30,4 +30,5 @@ class Loader:
         self.offset += self.batch_size
         if len(res) == 0:
             raise StopIteration
+        print("a")
         return res
