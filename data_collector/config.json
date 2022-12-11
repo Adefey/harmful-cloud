@@ -2,7 +2,7 @@
     "vk_token": "jones",
     "api_version": "5.131",
     "group_ids": [
-        "-193207811",
+       "-193207811",
         "-59336460",
         "-103133619",
         "-40427933",
@@ -22,10 +22,12 @@
         "-58771215",
         "-192956",
         "-61281696",
-        "-166774454"
+        "-166774454",
+        "-54295855",
+        "-32151480"
     ],
-    "cache_filename": "__cache.json",
-    "result_path": "result/data.csv",
+    "cache_filename": "__cache.csv",
+    "result_path": "result/data.json",
     "save_to_disc": "yes",
     "save_to_mariadb": "yes",
     "MYSQL_PASSWORD": "14565",

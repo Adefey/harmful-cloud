@@ -13,7 +13,7 @@ format:
 	autopep8 --in-place --max-line-length 80 $(SOURCES)
 
 check:
-	pylint $(SOURCES) --disable=missing-module-docstring,missing-function-docstring,missing-class-docstring,wrong-import-position,line-too-long,logging-fstring-interpolation,wrong-import-order,broad-except
+	pylint $(SOURCES) --disable=missing-module-docstring,missing-function-docstring,missing-class-docstring,wrong-import-position,line-too-long,logging-fstring-interpolation,wrong-import-order,broad-except,too-many-locals,invalid-name
 
 receive_data:
 	python3 ./sources/main_receive_data.py $(CONFIG_PATH)

@@ -1,7 +1,6 @@
 import requests
-import os
-import json
 import logging
+import re
 from functools import reduce
 logging.basicConfig(filename="logs.txt", filemode='a',
                     format="%(asctime)s %(message)s", datefmt="%I:%M:%S %p", level=logging.INFO)
@@ -10,6 +9,12 @@ logging.basicConfig(filename="logs.txt", filemode='a',
 STRIDE = 75
 TIMEOUT = 80
 EXECUTE_COUNT = 25
+
+
+def clean_string(string):
+    permitted_chars = "^0-9A-Za-zА-Яа-яёЁ.!?/@#()*+-"
+    string = re.sub(f"[{permitted_chars}]+", " ", string)
+    return string
 
 
 def make_request(vk_token, api_version, method, parameters):
@@ -31,9 +36,9 @@ def make_request(vk_token, api_version, method, parameters):
 
 
 def generate_data_to_cache(vk_token, api_version, group_ids, cache_filename):
-    '''Пишет данные в кэш'''
+    '''Пишет данные в CSV кэш'''
     with open(cache_filename, "w", encoding="UTF-8") as file:
-        file.write("{")
+        file.write("group,post_text,comment_text\n")
         for group_id in group_ids:
             posts = get_wall_post_links(vk_token, api_version, group_id)
             for i in range(0, len(posts), EXECUTE_COUNT):
@@ -42,17 +47,26 @@ def generate_data_to_cache(vk_token, api_version, group_ids, cache_filename):
                 posts_comments = get_post_text_comments_execute(
                     vk_token, api_version, group_id, cur_post_ids)
                 post_text_pairs = zip(cur_post_texts, posts_comments)
-                json_string = json.dumps(
-                    dict(post_text_pairs), ensure_ascii=False, indent=4)
-                if len(json_string) < 6:
-                    continue
-                string_to_file = f"{json_string.replace('{','').replace('}','')},"
-                file.write(string_to_file)
-    with open(cache_filename, 'rb+') as file:  # Хочу удалить последний символ
-        file.seek(-1, os.SEEK_END)
-        file.truncate()
-    with open(cache_filename, "a", encoding="UTF-8") as file:
-        file.write("}")
+                group_name = get_group_name(vk_token, api_version, group_id)
+                for post_text, post_comments in post_text_pairs:
+                    for post_comment in post_comments:
+                        group_name_clean = clean_string(group_name)
+                        post_text_clean = clean_string(post_text)
+                        post_comment_clean = clean_string(post_comment)
+                        if (group_name_clean != "") and (post_text_clean != "") and (post_comment_clean != ""):
+                            file.write(
+                                f"{group_name_clean},{post_text_clean},{post_comment_clean}\n")
+
+
+def get_group_name(vk_token, api_version, group_id):
+    try:
+        response = make_request(vk_token, api_version, "groups.getById", {
+            "group_id": group_id[1:]})
+    except RuntimeError as exception:
+        logging.info(f"Error occured while fetching group name:\n{exception}")
+        return None
+    group_name = response["response"][0]["name"]
+    return group_name
 
 
 def get_wall_post_links(vk_token, api_version, group_id):

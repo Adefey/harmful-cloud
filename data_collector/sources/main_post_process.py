@@ -1,4 +1,5 @@
-from post_processor import json_to_dataframe
+import pandas as pd
+from post_processor import dataframe_to_json
 import sys
 import json
 from sqlalchemy import create_engine
@@ -11,15 +12,14 @@ def main():
     config_path = sys.argv[1]
     with open(config_path, "r", encoding="UTF-8") as file:
         config = json.load(file)
-    with open(config["cache_filename"], "r", encoding="UTF-8") as file:
-        logging.info("Start reading file")
-        raw_result_json = file.read()
-        logging.info("File is read")
-    result = json_to_dataframe(raw_result_json)
+    result = pd.read_csv(config["cache_filename"])
+    logging.info("File is read")
+    result_json = dataframe_to_json(result)
     if config["save_to_disc"] == "yes":
-        logging.info("Saving to CSV file")
-        result.to_csv(config["result_path"])
-        logging.info("CSV file is saved")
+        logging.info("Saving to JSON file")
+        with open(config["result_path"], "w", encoding="UTF-8") as file:
+            json.dump(result_json, file, indent=4, ensure_ascii=False)
+        logging.info("JSON file is saved")
     if config["save_to_mariadb"] == "yes":
         user = config["MYSQL_USER"]
         password = config["MYSQL_PASSWORD"]

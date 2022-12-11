@@ -1,6 +1,6 @@
-FROM fedora:36
+FROM fedora:37
 
-RUN dnf update --refresh && \
+RUN dnf update --refresh -y && \
     dnf -y install python && \
     dnf -y install make && \
     dnf -y install pip
