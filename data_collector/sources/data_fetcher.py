@@ -12,7 +12,7 @@ EXECUTE_COUNT = 25
 
 
 def clean_string(string):
-    permitted_chars = "^0-9A-Za-zА-Яа-яёЁ.!?/@#()*+-"
+    permitted_chars = "^0-9A-Za-zА-Яа-яёЁ!,:;.!?/@#()*+-"
     string = re.sub(f"[{permitted_chars}]+", " ", string)
     return string
 
@@ -21,7 +21,8 @@ def make_request(vk_token, api_version, method, parameters):
     '''Делает запрос в vk api'''
     base_url = "https://api.vk.com/method/"
     param_dict = parameters
-    param_dict.update({"v": api_version, "access_token": {vk_token}})
+    param_dict.update({"v": api_version, "access_token": {
+                      vk_token.get_next_token()}})
     request_method_str = f"{base_url}{method}"
     try:
         response = requests.get(
@@ -38,7 +39,7 @@ def make_request(vk_token, api_version, method, parameters):
 def generate_data_to_cache(vk_token, api_version, group_ids, cache_filename):
     '''Пишет данные в CSV кэш'''
     with open(cache_filename, "w", encoding="UTF-8") as file:
-        file.write("group,post_text,comment_text\n")
+        file.write("group|post_text|comment_text\n")
         for group_id in group_ids:
             posts = get_wall_post_links(vk_token, api_version, group_id)
             for i in range(0, len(posts), EXECUTE_COUNT):
@@ -55,7 +56,7 @@ def generate_data_to_cache(vk_token, api_version, group_ids, cache_filename):
                         post_comment_clean = clean_string(post_comment)
                         if (group_name_clean != "") and (post_text_clean != "") and (post_comment_clean != ""):
                             file.write(
-                                f"{group_name_clean},{post_text_clean},{post_comment_clean}\n")
+                                f"{group_name_clean}|{post_text_clean}|{post_comment_clean}\n")
 
 
 def get_group_name(vk_token, api_version, group_id):

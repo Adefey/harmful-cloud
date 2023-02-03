@@ -6,7 +6,7 @@ logging.basicConfig(filename="logs.txt", filemode='a',
 
 
 def clean_string(string):
-    permitted_chars = "^0-9A-Za-zА-Яа-яёЁ.!?/@#()*+-"
+    permitted_chars = "^0-9A-Za-zА-Яа-яёЁ!,:;.!?/@#()*+-"
     string = re.sub(f"[{permitted_chars}]+", " ", string)
     return string
 
@@ -23,3 +23,13 @@ def dataframe_to_json(df):
             json_dict["intents"] += [{"tag": group,
                                       "patterns": post, "responses": comments}]
     return json_dict
+
+def post_post_process(data):
+    actual_data = data["intents"]
+    result = []
+    for entity in actual_data:
+        result += [{"from" : "post", "text" : entity["patterns"]}]
+        for comment in entity["responses"]:
+            result += [{"from" : "comment", "text" : entity["responses"]}]
+
+    return result

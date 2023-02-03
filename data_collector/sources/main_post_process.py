@@ -1,5 +1,5 @@
 import pandas as pd
-from post_processor import dataframe_to_json
+from post_processor import dataframe_to_json post_post_process
 import sys
 import json
 from sqlalchemy import create_engine
@@ -12,9 +12,11 @@ def main():
     config_path = sys.argv[1]
     with open(config_path, "r", encoding="UTF-8") as file:
         config = json.load(file)
-    result = pd.read_csv(config["cache_filename"])
+    result = pd.read_csv(config["cache_filename"], sep="|")
     logging.info("File is read")
+    print(result)
     result_json = dataframe_to_json(result)
+    result_json = post_post_process(result_json)
     if config["save_to_disc"] == "yes":
         logging.info("Saving to JSON file")
         with open(config["result_path"], "w", encoding="UTF-8") as file:
