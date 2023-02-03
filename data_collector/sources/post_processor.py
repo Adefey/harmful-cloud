@@ -30,6 +30,6 @@ def post_post_process(data):
     for entity in actual_data:
         result += [{"from" : "post", "text" : entity["patterns"]}]
         for comment in entity["responses"]:
-            result += [{"from" : "comment", "text" : entity["responses"]}]
+            result += [{"from" : "comment", "text" : comment}]
 
     return result
