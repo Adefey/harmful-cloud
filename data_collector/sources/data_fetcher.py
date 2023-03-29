@@ -29,7 +29,7 @@ def make_request(vk_token, api_version, method, parameters):
     param_dict.update(
         {"v": api_version, "access_token": vk_token.get_next_token()})
     request_method_str = f"{base_url}{method}"
-    pairs = [(key, value) for key, value in param_dict.items()]
+    pairs = list(param_dict.items())
     query_string = "&".join([f"{pair[0]}={pair[1]}" for pair in pairs])
     logging.info(f"{request_method_str}?{query_string}")
     try:
@@ -74,7 +74,7 @@ def prepare_group_ids(vk_token, api_version, approx_count):
         123002442,
         92204627,
     ]  # Бауманское наследие не забыто!
-    logging.info(f"Group ids (first 50): {group_ids[:50]}")
+    logging.info(f"Group ids (all): {group_ids}")
     logging.info(f"Total: {len(group_ids)}")
     shuffle(group_ids)
     return group_ids
@@ -92,7 +92,8 @@ def generate_data_to_cache(vk_token, api_version, group_ids, cache_filename):
             for post in posts:
                 post_text_clean = clean_string(post[1])  # [1] Текст поста
                 file.write(f"{group_name_clean}|{post_text_clean}\n")
-                if (len(post_text_clean) > 10) and (len(post_text_clean) < 2000):  # пусть посты будут не очень короткие, но и не очень длинные
+                # пусть посты будут не очень короткие, но и не очень длинные
+                if (len(post_text_clean) > 10) and (len(post_text_clean) < 2000):
                     file.write(f"{group_name_clean}|{post_text_clean}\n")
 
 
