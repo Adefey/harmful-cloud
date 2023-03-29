@@ -1,7 +1,8 @@
 import sys
 import json
+import time
 
-from data_fetcher import generate_data_to_cache
+from data_fetcher import generate_data_to_cache, prepare_group_ids
 
 
 class token_container:
@@ -21,8 +22,10 @@ def main():
     with open(config_path, "r", encoding="UTF-8") as file:
         config = json.load(file)
     tokens = token_container(config["vk_token"])
-    generate_data_to_cache(tokens, config["api_version"],
-                           config["group_ids"], config["cache_filename"])
+    group_ids = prepare_group_ids(tokens, config["api_version"], 3000)
+    time.sleep(5)
+    generate_data_to_cache(
+        tokens, config["api_version"], group_ids, config["cache_filename"])
     print("SUCCESS")
 
 

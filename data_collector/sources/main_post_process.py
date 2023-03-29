@@ -1,10 +1,10 @@
 import pandas as pd
-from post_processor import dataframe_to_json, post_post_process
+from post_processor import dataframe_to_json
 import sys
 import json
 from sqlalchemy import create_engine
 import logging
-logging.basicConfig(filename="logs.txt", filemode='a',
+logging.basicConfig(filename="logs.txt", filemode='w',
                     format="%(asctime)s %(message)s", datefmt="%I:%M:%S %p", level=logging.INFO)
 
 
@@ -16,7 +16,6 @@ def main():
     logging.info("File is read")
     print(result)
     result_json = dataframe_to_json(result)
-    result_json = post_post_process(result_json)
     if config["save_to_disc"] == "yes":
         logging.info("Saving to JSON file")
         with open(config["result_path"], "w", encoding="UTF-8") as file:

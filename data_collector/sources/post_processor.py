@@ -1,12 +1,12 @@
 import re
 from tqdm import tqdm
 import logging
-logging.basicConfig(filename="logs.txt", filemode='a',
+logging.basicConfig(filename="logs.txt", filemode='w',
                     format="%(asctime)s %(message)s", datefmt="%I:%M:%S %p", level=logging.INFO)
 
 
 def clean_string(string):
-    permitted_chars = "^0-9A-Za-zА-Яа-яёЁ!,:;.!?/@#()*+-"
+    permitted_chars = "^0-9A-Za-zА-Яа-яёЁ!,:;_.!?/@#()*+-"
     string = re.sub(f"[{permitted_chars}]+", " ", string)
     return string
 
@@ -16,20 +16,6 @@ def dataframe_to_json(df):
     json_dict = {"intents": []}
     groups = df["group"].unique()
     for group in tqdm(groups):
-        posts = df.loc[df["group"] == group]["post_text"].unique()
-        for post in tqdm(posts):
-            comments = list(df.loc[(df["group"] == group) & (
-                df["post_text"] == post)]["comment_text"])
-            json_dict["intents"] += [{"tag": group,
-                                      "patterns": post, "responses": comments}]
+        posts = list(df.loc[df["group"] == group]["post_text"].unique())
+        json_dict["intents"] += [{"group": group, "texts": posts}]
     return json_dict
-
-def post_post_process(data):
-    actual_data = data["intents"]
-    result = []
-    for entity in actual_data:
-        result += [{"from" : "post", "text" : entity["patterns"]}]
-        for comment in entity["responses"]:
-            result += [{"from" : "comment", "text" : comment}]
-
-    return result
